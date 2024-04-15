@@ -6,7 +6,7 @@ class Stock(QWidget):
     def __init__(self):
         super().__init__()
         self.currentPage = 0
-        self.pageSize = 20  # Ajusta el tamaño de la página según lo necesites
+        self.pageSize = 20
         self.initUI()
 
     def initUI(self):
@@ -91,7 +91,6 @@ class Stock(QWidget):
         dialog.exec_()
 
     def buscarProducto(self):
-        # Lógica para buscar un producto
         pass
 
     def abrirDialogoProducto(self, item):
