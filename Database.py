@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from bson.objectid import ObjectId
 
 class Database:
     _instance = None
@@ -25,3 +26,8 @@ class Database:
         collection = self.database.productos
         products = collection.find().skip(skip).limit(limit)
         return products
+    
+    def getProductByID(self, product_id):
+        collection = self.database.productos
+        product = collection.find_one({"_id": ObjectId(product_id)})
+        return product

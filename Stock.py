@@ -1,11 +1,12 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from Database import Database
+from ProductDialog import ProductDialog
 
 class Stock(QWidget):
     def __init__(self):
         super().__init__()
         self.currentPage = 0
-        self.pageSize = 20
+        self.pageSize = 20  # Ajusta el tamaño de la página según lo necesites
         self.initUI()
 
     def initUI(self):
@@ -43,14 +44,15 @@ class Stock(QWidget):
         self.page_label = QLabel()
         pagination_layout.addStretch(1)
         pagination_layout.addWidget(self.prev_button)
-        pagination_layout.addStretch(1)
         pagination_layout.addWidget(self.page_label)
-        pagination_layout.addStretch(1)
         pagination_layout.addWidget(self.next_button)
         pagination_layout.addStretch(1)
         layout.addLayout(pagination_layout)
 
         self.actualizarStock()
+
+        # Conectar señal itemDoubleClicked para abrir el diálogo con los datos del producto
+        self.table_stock.itemDoubleClicked.connect(self.abrirDialogoProducto)
 
     def actualizarStock(self):
         totalItems = Database().getStockCount()
@@ -59,6 +61,7 @@ class Stock(QWidget):
 
     def showPage(self):
         startIndex = self.currentPage * self.pageSize
+        endIndex = startIndex + self.pageSize
         stock = Database().getStock(startIndex, self.pageSize)
 
         self.table_stock.setRowCount(0)
@@ -84,9 +87,15 @@ class Stock(QWidget):
             self.showPage()
 
     def anadirProducto(self):
-        # Lógica para añadir un nuevo producto
-        pass
+        dialog = ProductDialog()
+        dialog.exec_()
 
     def buscarProducto(self):
         # Lógica para buscar un producto
         pass
+
+    def abrirDialogoProducto(self, item):
+        id_producto = self.table_stock.item(item.row(), 0).text()
+        producto = Database().getProductByID(id_producto)
+        dialog = ProductDialog(producto)
+        dialog.exec_()

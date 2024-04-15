@@ -48,7 +48,6 @@ class MainWindow(QMainWindow):
         pedidosMenu = menubar.addMenu('Pedidos')
         pedidosMenu.addAction(verPedidosAction)
 
-        # contenido principal
         self.central_widget = QWidget()
         self.setCentralWidget(self.central_widget)
         self.layout = QVBoxLayout()
