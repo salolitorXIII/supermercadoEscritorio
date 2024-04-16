@@ -12,7 +12,7 @@ class MainWindow(QMainWindow):
         self.setWindowTitle('Menú Principal')
         verClientesAction = QAction('Ver Clientes', self)
         verClientesAction.triggered.connect(self.verClientes)
-
+    
         verEmpleadosAction = QAction('Ver Empleados', self)
         verEmpleadosAction.triggered.connect(self.verEmpleados)
 

@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QL
 from Database import Database
 from ProductDialog import ProductDialog
 
+
 class Stock(QWidget):
     def __init__(self):
         super().__init__()
@@ -14,12 +15,16 @@ class Stock(QWidget):
 
         # Top
         top_layout = QHBoxLayout()
+        top_layout.setContentsMargins(10, 10, 10, 10)
+
         anadir_producto_button = QPushButton("Añadir Producto")
         anadir_producto_button.clicked.connect(self.anadirProducto)
         top_layout.addWidget(anadir_producto_button)
 
         self.search_field = QLineEdit()
         self.search_field.setPlaceholderText("Buscar")
+        self.search_field.setMinimumWidth(200)
+        self.search_field.returnPressed.connect(self.buscarProducto)
         top_layout.addWidget(self.search_field)
 
         buscar_button = QPushButton("Buscar")
@@ -51,7 +56,7 @@ class Stock(QWidget):
 
         self.actualizarStock()
 
-        # Conectar señal itemDoubleClicked para abrir el diálogo con los datos del producto
+        # itemDoubleClicked en item de la tabla para abrir el diálogo con los datos del producto
         self.table_stock.itemDoubleClicked.connect(self.abrirDialogoProducto)
 
     def actualizarStock(self):
@@ -61,7 +66,6 @@ class Stock(QWidget):
 
     def showPage(self):
         startIndex = self.currentPage * self.pageSize
-        endIndex = startIndex + self.pageSize
         stock = Database().getStock(startIndex, self.pageSize)
 
         self.table_stock.setRowCount(0)
@@ -91,7 +95,26 @@ class Stock(QWidget):
         dialog.exec_()
 
     def buscarProducto(self):
-        pass
+        texto_busqueda = self.search_field.text().strip().lower()
+
+        if texto_busqueda:
+            resultados = Database().buscarProducto(texto_busqueda)
+            self.mostrarResultadosBusqueda(resultados)
+        else:
+            self.actualizarStock()
+
+    def mostrarResultadosBusqueda(self, resultados):
+        self.table_stock.setRowCount(0)
+        for row, producto in enumerate(resultados):
+            self.table_stock.insertRow(row)
+            self.table_stock.setItem(row, 0, QTableWidgetItem(str(producto["_id"])))
+            self.table_stock.setItem(row, 1, QTableWidgetItem(producto["nombre"]))
+            self.table_stock.setItem(row, 2, QTableWidgetItem(producto["packaging"]))
+            self.table_stock.setItem(row, 3, QTableWidgetItem(producto["nombreCategoria"]))
+            self.table_stock.setItem(row, 4, QTableWidgetItem(producto["nombreProveedor"]))
+            self.table_stock.setItem(row, 5, QTableWidgetItem(str(producto["stock"])))
+
+        self.page_label.setText("Resultados de la búsqueda")
 
     def abrirDialogoProducto(self, item):
         id_producto = self.table_stock.item(item.row(), 0).text()

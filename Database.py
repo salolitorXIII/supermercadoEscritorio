@@ -1,5 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
+from bson.errors import InvalidId
+
 
 class Database:
     _instance = None
@@ -31,3 +33,54 @@ class Database:
         collection = self.database.productos
         product = collection.find_one({"_id": ObjectId(product_id)})
         return product
+
+    def buscarProducto(self, termino):
+        try:
+            ObjectId(termino)
+            es_id = True
+        except InvalidId:
+            es_id = False
+
+        filtro = {}
+
+        if es_id:
+            filtro.update({
+                "$or": [
+                    {"_id": ObjectId(termino)},
+                    {"idCategoria": ObjectId(termino)},
+                    {"idProveedor": ObjectId(termino)}
+                ]
+            })
+        else:
+            filtro.update({
+                "$or": [
+                    {"nombre": {"$regex": termino, "$options": "i"}},
+                    {"nombreCategoria": {"$regex": termino, "$options": "i"}},
+                    {"nombreProveedor": {"$regex": termino, "$options": "i"}}
+                ]
+            })
+
+        productos = self.database.productos.find(filtro)
+        return list(productos)
+
+    def getCategorias(self):
+        collection = self.database.categorias
+        categorias = collection.find()
+        return list(categorias)
+    
+    def getProveedores(self):
+        collection = self.database.proveedores
+        proveedores = collection.find()
+        return list(proveedores)
+    
+    def guardarProducto(self, producto):
+        collection = self.database.productos
+        collection.insert_one(producto)
+
+    def actualizarProducto(self, producto_id, producto):
+        collection = self.database.productos
+        collection.update_one({"_id": ObjectId(producto_id)}, {"$set": producto})
+
+    def eliminarProducto(self, producto_id):
+        collection = self.database.productos
+        collection.delete_one({"_id": ObjectId(producto_id)})
