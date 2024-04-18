@@ -156,25 +156,35 @@ class ProductDialog(QDialog):
         except ValueError:
             QMessageBox.warning(self, "Formato Inválido", "Por favor, introduzca un número válido para el precio de compra, precio de venta y stock.")
             return
+        
+        producto = {
+            "idCategoria": categoria_id,
+            "nombreCategoria": self.categoria_dropdown.currentText(),
+            "nombre": nombre,
+            "image": image_url,
+            "precioCompra": precio_compra,
+            "precioVenta": precio_venta,
+            "precioVentaString": precio_venta_str,
+            "packaging": packaging,
+            "stock": stock,
+            "idProveedor": proveedor_id,
+            "nombreProveedor": self.proveedor_dropdown.currentText()
+        }
 
         if self.producto is not None:
-            Database().actualizarProducto(self.producto.get('_id'), nombre, packaging, precio_compra, precio_venta, precio_venta_str, stock, categoria_id, proveedor_id, image_url)
+            Database().actualizarProducto(self.producto.get('_id'), producto)
             QMessageBox.information(self, "Producto Actualizado", "El producto ha sido actualizado correctamente.")
             self.accept()
-            return
         else:
-            Database().guardarProducto(nombre, packaging, precio_compra, precio_venta, precio_venta_str, stock, categoria_id, proveedor_id, image_url)
+            Database().guardarProducto(producto)
             QMessageBox.information(self, "Producto Guardado", "El producto ha sido guardado correctamente.")
             self.accept()
-            return
 
     def eliminarProducto(self):
         nombre_producto = self.nombre_field.text().strip()
         confirmacion = self.obtenerConfirmacion("Eliminar Producto", f"¿Estás seguro de que deseas eliminar el producto '{nombre_producto}'?")
 
         if confirmacion == nombre_producto:
-            # Aquí puedes llamar a una función de tu base de datos para eliminar el producto
-            # database.eliminarProducto(nombre_producto)
             QMessageBox.information(self, "Producto Eliminado", "El producto ha sido eliminado correctamente.")
             self.accept()
         elif confirmacion:
