@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from Database import Database
-from ProductDialog import ProductDialog
+from Productos.ProductDialog import ProductDialog
 
 
 class Stock(QWidget):

@@ -1,7 +1,7 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QMenu, QVBoxLayout, QLabel, QWidget
-from Stock import Stock
-
+from Productos.Stock import Stock
+from Productos.Categorias import Categorias
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -10,24 +10,23 @@ class MainWindow(QMainWindow):
 
     def initUI(self):
         self.setWindowTitle('Menú Principal')
+        self.views = {}
+        self.createViews()
+
         verClientesAction = QAction('Ver Clientes', self)
-        verClientesAction.triggered.connect(self.verClientes)
+        verClientesAction.triggered.connect(self.showView('Clientes'))
     
         verEmpleadosAction = QAction('Ver Empleados', self)
-        verEmpleadosAction.triggered.connect(self.verEmpleados)
-
-        verProductosAction = QAction('Ver Productos', self)
-        verProductosAction.triggered.connect(self.verProductos)
+        verEmpleadosAction.triggered.connect(self.showView('Empleados'))
 
         verCategoriasAction = QAction('Ver Categorías', self)
-        verCategoriasAction.triggered.connect(self.verCategorias)
+        verCategoriasAction.triggered.connect(self.showView('Categorias'))
 
         verStockAction = QAction('Ver Stock', self)
-        verStockAction.triggered.connect(self.verStock)
-        self.stock_view = Stock()
+        verStockAction.triggered.connect(self.showView('Stock'))
 
         verPedidosAction = QAction('Ver Pedidos', self)
-        verPedidosAction.triggered.connect(self.verPedidos)
+        verPedidosAction.triggered.connect(self.showView('Pedidos'))
 
         # Top menu
         menubar = self.menuBar()
@@ -40,7 +39,6 @@ class MainWindow(QMainWindow):
 
         productosMenu = menubar.addMenu('Productos')
         productosSubMenu = QMenu('Productos', self)
-        productosSubMenu.addAction(verProductosAction)
         productosSubMenu.addAction(verCategoriasAction)
         productosSubMenu.addAction(verStockAction)
         productosMenu.addMenu(productosSubMenu)
@@ -48,39 +46,31 @@ class MainWindow(QMainWindow):
         pedidosMenu = menubar.addMenu('Pedidos')
         pedidosMenu.addAction(verPedidosAction)
 
-        self.central_widget = QWidget()
-        self.setCentralWidget(self.central_widget)
-        self.layout = QVBoxLayout()
-        self.central_widget.setLayout(self.layout)
-        self.layout.addWidget(QLabel('¡Bienvenido! Seleccione una opción del menú.'))
         self.showMaximized()
 
-    def verClientes(self):
-        self.layout.removeWidget(self.central_widget.findChild(QWidget))
-        self.layout.addWidget(QLabel('Vista de Clientes'))
+    def createViews(self):
+        self.views['Clientes'] = QLabel('Vista de Clientes')
+        self.views['Empleados'] = QLabel('Vista de Empleados')
+        self.views['Categorias'] = Categorias()
+        self.views['Stock'] = Stock()
+        self.views['Pedidos'] = QLabel('Vista de Pedidos')
 
-    def verEmpleados(self):
-        self.layout.removeWidget(self.central_widget.findChild(QWidget))
-        self.layout.addWidget(QLabel('Vista de Empleados'))
+        layout = QVBoxLayout()
+        for view in self.views.values():
+            layout.addWidget(view)
+            view.hide()
+        central_widget = QWidget()
+        central_widget.setLayout(layout)
+        self.setCentralWidget(central_widget)
 
-    def verProductos(self):
-        self.layout.removeWidget(self.central_widget.findChild(QWidget))
-        self.layout.addWidget(QLabel('Vista de Productos'))
-
-    def verCategorias(self):
-        self.layout.removeWidget(self.central_widget.findChild(QWidget))
-        self.layout.addWidget(QLabel('Vista de Categorías'))
-
-    def verStock(self):
-        self.layout.removeWidget(self.central_widget.findChild(QWidget))
-        self.stock_view.actualizarStock()
-        self.layout.addWidget(self.stock_view)
-        
-
-    def verPedidos(self):
-        self.layout.removeWidget(self.central_widget.findChild(QWidget))
-        self.layout.addWidget(QLabel('Vista de Pedidos'))
-
+    def showView(self, view_name):
+        def show():
+            for name, view in self.views.items():
+                if name == view_name:
+                    view.show()
+                else:
+                    view.hide()
+        return show
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

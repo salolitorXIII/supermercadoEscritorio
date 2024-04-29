@@ -84,3 +84,34 @@ class Database:
     def eliminarProducto(self, producto_id):
         collection = self.database.productos
         collection.delete_one({"_id": ObjectId(producto_id)})
+
+    
+    # Categorias
+    def getCategoriasCount(self):
+        collection = self.database.categorias
+        total_count = collection.count_documents({})
+        return total_count
+    
+    def getCategorias(self, skip, limit):
+        collection = self.database.categorias
+        products = collection.find().skip(skip).limit(limit)
+        return products
+    
+    def buscarCategoria(self, termino):
+        filtro = {}
+        try:
+            ObjectId(termino)
+            filtro.update({
+                "$or": [
+                    {"_id": ObjectId(termino)}
+                ]
+            })
+        except InvalidId:
+            filtro.update({
+                "$or": [
+                    {"nombre": {"$regex": termino, "$options": "i"}}
+                ]
+            }) 
+
+        categorias = self.database.categorias.find(filtro)
+        return list(categorias)
