@@ -40,6 +40,21 @@ class ProductDialog(QDialog):
         form_layout.addWidget(self.stock_field)
         layout.addLayout(form_layout)
 
+        busqueda_layout = QHBoxLayout()
+        # Búsqueda dinámica de categorías
+        self.busqueda_categoria_field = QLineEdit()
+        self.busqueda_categoria_field.setPlaceholderText("Buscar Categoría...")
+        self.busqueda_categoria_field.textChanged.connect(self.actualizarCategorias)
+        busqueda_layout.addWidget(self.busqueda_categoria_field)
+
+        # Búsqueda dinámica de proveedores
+        self.busqueda_proveedor_field = QLineEdit()
+        self.busqueda_proveedor_field.setPlaceholderText("Buscar Proveedor...")
+        self.busqueda_proveedor_field.textChanged.connect(self.actualizarProveedores)
+        busqueda_layout.addWidget(self.busqueda_proveedor_field)
+
+        layout.addLayout(busqueda_layout)
+
         # ComboBox
         dropdown_layout = QHBoxLayout()
         dropdown_layout.addWidget(QLabel("Categoría"))
@@ -49,27 +64,32 @@ class ProductDialog(QDialog):
         self.proveedor_dropdown = QComboBox()
         dropdown_layout.addWidget(self.proveedor_dropdown)
         layout.addLayout(dropdown_layout)
+
         # Llenar los ComboBox con datos
         self.llenarCategorias()
         self.llenarProveedores()
 
         # Imagen
-        image_frame = QFrame()
-        image_frame.setFrameShape(QFrame.Box)
-        image_layout = QHBoxLayout()
+        self.image_frame = QFrame()
+        self.image_frame.setFrameShape(QFrame.Box)
+        self.image_layout = QHBoxLayout()
         self.imagen_label = QLabel()
         self.imagen_label.setAlignment(Qt.AlignCenter)
         self.imagen_label.setMinimumSize(300, 300)
-        self.descargarImagen(self.producto.get("image", "https://placehold.co/300x300/orange/white") if self.producto is not None else "https://placehold.co/300x300/orange/white")
-        image_layout.addWidget(self.imagen_label)
-        image_frame.setLayout(image_layout)
-        layout.addWidget(image_frame)
+        self.descargarImagen(self.producto.get("image", "https://placehold.co/300x300") if self.producto is not None else "https://placehold.co/300x300")
+        self.image_layout.addWidget(self.imagen_label)
+        self.image_frame.setLayout(self.image_layout)
+        layout.addWidget(self.image_frame)
 
         # Campo de URL de imagen
         url_layout = QHBoxLayout()
         url_layout.addWidget(QLabel("Imagen URL"))
         self.image_field = QLineEdit(str(self.producto.get("image", "")) if self.producto is not None else "")
+        self.image_field.editingFinished.connect(lambda: self.descargarImagen(self.image_field.text().strip()))
         url_layout.addWidget(self.image_field)
+        self.cargar_imagen_button = QPushButton("Cargar Imagen")
+        self.cargar_imagen_button.clicked.connect(lambda: self.descargarImagen(self.image_field.text().strip()))
+        url_layout.addWidget(self.cargar_imagen_button)
         layout.addLayout(url_layout)
 
         # Botones
@@ -85,8 +105,23 @@ class ProductDialog(QDialog):
         button_layout.addWidget(self.cancelar_button)
         layout.addLayout(button_layout)
 
-
         self.setLayout(layout)
+
+    def actualizarCategorias(self, texto):
+        self.categoria_dropdown.clear()
+        categorias = Database().getAllDocumentos("categorias")
+        for categoria in categorias:
+            nombre = categoria['nombre']
+            if texto.lower() in nombre.lower():
+                self.categoria_dropdown.addItem(nombre)
+
+    def actualizarProveedores(self, texto):
+        self.proveedor_dropdown.clear()
+        proveedores = Database().getAllDocumentos("proveedores")
+        for proveedor in proveedores:
+            nombre = proveedor['nombre']
+            if texto.lower() in nombre.lower():
+                self.proveedor_dropdown.addItem(nombre)
 
 
     def descargarImagen(self, url):
@@ -96,8 +131,13 @@ class ProductDialog(QDialog):
         if reply.error() == 0:
             data = reply.readAll()
             pixmap = QPixmap()
-            pixmap.loadFromData(data)
-            self.imagen_label.setPixmap(pixmap.scaled(300, 300, Qt.KeepAspectRatio))
+            if pixmap.isNull():
+                pixmap = QPixmap("https://placehold.co/300x300")
+            else:
+                pixmap.loadFromData(data)
+        else:
+            pixmap = QPixmap("https://thumbs.dreamstime.com/b/illustrazione-del-segno-di-errore-23221919.jpg")
+        self.imagen_label.setPixmap(pixmap.scaled(300, 300, Qt.KeepAspectRatio))
 
     def llenarCategorias(self):
         categorias = Database().getAllDocumentos("categorias")
