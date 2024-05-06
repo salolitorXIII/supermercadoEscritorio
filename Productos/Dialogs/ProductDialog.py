@@ -100,7 +100,7 @@ class ProductDialog(QDialog):
             self.imagen_label.setPixmap(pixmap.scaled(300, 300, Qt.KeepAspectRatio))
 
     def llenarCategorias(self):
-        categorias = Database().getCategorias()
+        categorias = Database().getAllDocumentos("categorias")
         categorias_map = {}
         for categoria in categorias:
             idCategoria = categoria['_id']
@@ -116,7 +116,7 @@ class ProductDialog(QDialog):
                     self.categoria_dropdown.setCurrentIndex(indexCategoria)
 
     def llenarProveedores(self):
-        proveedores = Database().getProveedores()
+        proveedores = Database().getAllDocumentos("proveedores")
         proveedores_map = {}
         for proveedor in proveedores:
             idProveedor = proveedor['_id']
@@ -172,11 +172,11 @@ class ProductDialog(QDialog):
         }
 
         if self.producto is not None:
-            Database().actualizarProducto(self.producto.get('_id'), producto)
+            Database().actualizarDocumento("productos", self.producto.get('_id'), producto)
             QMessageBox.information(self, "Producto Actualizado", "El producto ha sido actualizado correctamente.")
             self.accept()
         else:
-            Database().guardarProducto(producto)
+            Database().guardarDocumento("productos", producto)
             QMessageBox.information(self, "Producto Guardado", "El producto ha sido guardado correctamente.")
             self.accept()
 
@@ -185,6 +185,7 @@ class ProductDialog(QDialog):
         confirmacion = self.obtenerConfirmacion("Eliminar Producto", f"¿Estás seguro de que deseas eliminar el producto '{nombre_producto}'?")
 
         if confirmacion == nombre_producto:
+            Database().eliminarDocumento("productos", self.producto.get('_id'))
             QMessageBox.information(self, "Producto Eliminado", "El producto ha sido eliminado correctamente.")
             self.accept()
         elif confirmacion:

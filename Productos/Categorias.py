@@ -1,5 +1,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from Database import Database
+from Productos.Dialogs.CategoriaDialog import CategoriaDialog
+
 
 class Categorias(QWidget):
     def __init__(self):
@@ -54,14 +56,16 @@ class Categorias(QWidget):
 
         self.actualizarCategorias()
 
+        self.table_categorias.itemDoubleClicked.connect(self.abrirDialogoProducto)
+
     def actualizarCategorias(self):
-        totalItems = Database().getCategoriasCount()
+        totalItems = Database().getDocumentosCount("categorias")
         self.totalPages = (totalItems // self.pageSize) + 1
         self.showPage()
 
     def showPage(self):
         startIndex = self.currentPage * self.pageSize
-        categorias = Database().getCategorias(startIndex, self.pageSize)
+        categorias = Database().getDocumentos("categorias", startIndex, self.pageSize)
         
         self.table_categorias.setRowCount(0)
         for row, categoria in enumerate(categorias):
@@ -91,4 +95,11 @@ class Categorias(QWidget):
         self.page_label.setText(f"Resultados de la búsqueda")
 
     def anadirCategoria(self):
-        pass
+        dialog = CategoriaDialog()
+        dialog.exec_()
+
+    def abrirDialogoProducto(self, item):
+        id_categoria = self.table_categorias.item(item.row(), 0).text()
+        categoria = Database().getDocumentoById("categorias", id_categoria)
+        dialog = CategoriaDialog(categoria)
+        dialog.exec_()

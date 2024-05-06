@@ -6,6 +6,7 @@ from bson.errors import InvalidId
 class Database:
     _instance = None
 
+    # Singleton
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
@@ -14,26 +15,54 @@ class Database:
             cls._instance.connect()
         return cls._instance
 
+    # Conector a la base de datos
     def connect(self):
         connectionString = "mongodb+srv://adminUser:adminUser@supermercado.jwzvs6g.mongodb.net/?retryWrites=true&w=majority&appName=supermercado"
         self.mongoClient = MongoClient(connectionString)
         self.database = self.mongoClient.supermercado
 
-    def getStockCount(self):
-        collection = self.database.productos
+
+
+    # Métodos para interactuar con la base de datos
+    # CREATE
+    def guardarDocumento(self, collection_name, documento):
+        collection = self.database[collection_name]
+        collection.insert_one(documento)
+
+    # READ
+    def getDocumentoById(self, collection_name, documento_id):
+        collection = self.database[collection_name]
+        documento = collection.find_one({"_id": ObjectId(documento_id)})
+        return documento
+    
+    def getDocumentosCount(self, collection_name):
+        collection = self.database[collection_name]
         total_count = collection.count_documents({})
         return total_count
 
-    def getStock(self, skip, limit):
-        collection = self.database.productos
-        products = collection.find().skip(skip).limit(limit)
-        return products
+    def getDocumentos(self, collection_name, skip, limit):
+        collection = self.database[collection_name]
+        documentos = collection.find().skip(skip).limit(limit)
+        return documentos
     
-    def getProductByID(self, product_id):
-        collection = self.database.productos
-        product = collection.find_one({"_id": ObjectId(product_id)})
-        return product
+    def getAllDocumentos(self, collection_name):
+        collection = self.database[collection_name]
+        documentos = collection.find()
+        return documentos
 
+    # UPDATE
+    def actualizarDocumento(self, collection_name, documento_id, documento):
+        collection = self.database[collection_name]
+        collection.update_one({"_id": ObjectId(documento_id)}, {"$set": documento})
+
+    # DELETE
+    def eliminarDocumento(self, collection_name, documento_id):
+        collection = self.database[collection_name]
+        collection.delete_one({"_id": ObjectId(documento_id)})
+
+
+
+    # Métodos específicos para la colección de productos
     def buscarProducto(self, termino):
         try:
             ObjectId(termino)
@@ -63,40 +92,7 @@ class Database:
         productos = self.database.productos.find(filtro)
         return list(productos)
 
-    def getCategorias(self):
-        collection = self.database.categorias
-        categorias = collection.find()
-        return list(categorias)
-    
-    def getProveedores(self):
-        collection = self.database.proveedores
-        proveedores = collection.find()
-        return list(proveedores)
-    
-    def guardarProducto(self, producto):
-        collection = self.database.productos
-        collection.insert_one(producto)
-
-    def actualizarProducto(self, producto_id, producto):
-        collection = self.database.productos
-        collection.update_one({"_id": ObjectId(producto_id)}, {"$set": producto})
-
-    def eliminarProducto(self, producto_id):
-        collection = self.database.productos
-        collection.delete_one({"_id": ObjectId(producto_id)})
-
-    
-    # Categorias
-    def getCategoriasCount(self):
-        collection = self.database.categorias
-        total_count = collection.count_documents({})
-        return total_count
-    
-    def getCategorias(self, skip, limit):
-        collection = self.database.categorias
-        products = collection.find().skip(skip).limit(limit)
-        return products
-    
+    # Métodos específicos para la colección de categorías
     def buscarCategoria(self, termino):
         filtro = {}
         try:

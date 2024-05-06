@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from Database import Database
-from Productos.ProductDialog import ProductDialog
+from Productos.Dialogs.ProductDialog import ProductDialog
 
 
 class Stock(QWidget):
@@ -60,13 +60,13 @@ class Stock(QWidget):
         self.table_stock.itemDoubleClicked.connect(self.abrirDialogoProducto)
 
     def actualizarStock(self):
-        totalItems = Database().getStockCount()
+        totalItems = Database().getDocumentosCount("productos")
         self.totalPages = (totalItems // self.pageSize) + 1
         self.showPage()
 
     def showPage(self):
         startIndex = self.currentPage * self.pageSize
-        stock = Database().getStock(startIndex, self.pageSize)
+        stock = Database().getDocumentos("productos", startIndex, self.pageSize)
 
         self.table_stock.setRowCount(0)
         for row, producto in enumerate(stock):
@@ -118,6 +118,6 @@ class Stock(QWidget):
 
     def abrirDialogoProducto(self, item):
         id_producto = self.table_stock.item(item.row(), 0).text()
-        producto = Database().getProductByID(id_producto)
+        producto = Database().getDocumentoById("productos", id_producto)
         dialog = ProductDialog(producto)
         dialog.exec_()
