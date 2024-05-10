@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QComboBox, QDialog, QFrame, QMessageBox, QInputDialog
 from PyQt5.QtGui import QPixmap
-from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest
+from PyQt5.QtNetwork import QNetworkAccessManager, QNetworkRequest, QNetworkReply
 from PyQt5.QtCore import QUrl, Qt
 from Database import Database
 
@@ -125,19 +125,20 @@ class ProductDialog(QDialog):
 
 
     def descargarImagen(self, url):
-        self.manager.get(QNetworkRequest(QUrl(url)))
+        request = QNetworkRequest(QUrl(url))
+        self.manager.get(request)
 
     def mostrarImagen(self, reply):
-        if reply.error() == 0:
+        if reply.error() == QNetworkReply.NoError:
             data = reply.readAll()
             pixmap = QPixmap()
-            if pixmap.isNull():
-                pixmap = QPixmap("https://placehold.co/300x300")
+            if pixmap.loadFromData(data):
+                self.imagen_label.setPixmap(pixmap.scaled(300, 300, Qt.KeepAspectRatio))
             else:
-                pixmap.loadFromData(data)
+                self.imagen_label.setText("Error: No se pudo cargar la imagen")
         else:
-            pixmap = QPixmap("https://thumbs.dreamstime.com/b/illustrazione-del-segno-di-errore-23221919.jpg")
-        self.imagen_label.setPixmap(pixmap.scaled(300, 300, Qt.KeepAspectRatio))
+            self.imagen_label.setText("Error: No se pudo cargar la imagen")
+
 
     def llenarCategorias(self):
         categorias = Database().getAllDocumentos("categorias")

@@ -1,7 +1,8 @@
-import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QAction, QMenu, QVBoxLayout, QLabel, QWidget
+from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QVBoxLayout, QLabel, QWidget
 from Productos.Stock import Stock
 from Productos.Categorias import Categorias
+from Database import Database
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -9,15 +10,10 @@ class MainWindow(QMainWindow):
         self.initUI()
 
     def initUI(self):
+        
         self.setWindowTitle('Menú Principal')
         self.views = {}
         self.createViews()
-
-        verClientesAction = QAction('Ver Clientes', self)
-        verClientesAction.triggered.connect(self.showView('Clientes'))
-    
-        verEmpleadosAction = QAction('Ver Empleados', self)
-        verEmpleadosAction.triggered.connect(self.showView('Empleados'))
 
         verCategoriasAction = QAction('Ver Categorías', self)
         verCategoriasAction.triggered.connect(self.showView('Categorias'))
@@ -31,12 +27,6 @@ class MainWindow(QMainWindow):
         # Top menu
         menubar = self.menuBar()
 
-        clientesMenu = menubar.addMenu('Clientes')
-        clientesMenu.addAction(verClientesAction)
-
-        empleadosMenu = menubar.addMenu('Empleados')
-        empleadosMenu.addAction(verEmpleadosAction)
-
         productosMenu = menubar.addMenu('Productos')
         productosSubMenu = QMenu('Productos', self)
         productosSubMenu.addAction(verCategoriasAction)
@@ -49,8 +39,8 @@ class MainWindow(QMainWindow):
         self.showMaximized()
 
     def createViews(self):
-        self.views['Clientes'] = QLabel('Vista de Clientes')
-        self.views['Empleados'] = QLabel('Vista de Empleados')
+        if Database().activeUser == "admin@supermercadosl.com":
+            return
         self.views['Categorias'] = Categorias()
         self.views['Stock'] = Stock()
         self.views['Pedidos'] = QLabel('Vista de Pedidos')
@@ -71,8 +61,3 @@ class MainWindow(QMainWindow):
                 else:
                     view.hide()
         return show
-
-if __name__ == '__main__':
-    app = QApplication(sys.argv)
-    mainWindow = MainWindow()
-    sys.exit(app.exec_())

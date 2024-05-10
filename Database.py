@@ -1,10 +1,12 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
+import re
 
 
 class Database:
     _instance = None
+    activeUser = ""
 
     # Singleton
     def __new__(cls):
@@ -20,7 +22,6 @@ class Database:
         connectionString = "mongodb+srv://adminUser:adminUser@supermercado.jwzvs6g.mongodb.net/?retryWrites=true&w=majority&appName=supermercado"
         self.mongoClient = MongoClient(connectionString)
         self.database = self.mongoClient.supermercado
-
 
 
     # Métodos para interactuar con la base de datos
@@ -59,7 +60,6 @@ class Database:
     def eliminarDocumento(self, collection_name, documento_id):
         collection = self.database[collection_name]
         collection.delete_one({"_id": ObjectId(documento_id)})
-
 
 
     # Métodos específicos para la colección de productos
@@ -111,3 +111,15 @@ class Database:
 
         categorias = self.database.categorias.find(filtro)
         return list(categorias)
+    
+    # Metodos específicos para la clase Login
+    def login(self, username, password):
+        regex_username = re.compile(username, re.IGNORECASE)
+        employee = self.database.empleados.find_one({"correo": {"$regex": regex_username}})
+
+        if employee:
+            if password == employee["contrasenya"]:
+                Database.activeUser = str(username).lower()
+                return True
+
+        return False
