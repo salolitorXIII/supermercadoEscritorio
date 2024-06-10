@@ -112,6 +112,26 @@ class Database:
         categorias = self.database.categorias.find(filtro)
         return list(categorias)
     
+    # Métodos específicos para la colección de proveedores
+    def buscarProveedor(self, termino):
+        filtro = {}
+        try:
+            ObjectId(termino)
+            filtro.update({
+                "$or": [
+                    {"_id": ObjectId(termino)}
+                ]
+            })
+        except InvalidId:
+            filtro.update({
+                "$or": [
+                    {"nombre": {"$regex": termino, "$options": "i"}}
+                ]
+            }) 
+
+        proveedores = self.database.proveedores.find(filtro)
+        return list(proveedores)
+    
     # Metodos específicos para la clase Login
     def login(self, username, password):
         regex_username = re.compile(username, re.IGNORECASE)

@@ -1,4 +1,4 @@
-from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QDialog, QMessageBox
+from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QDialog, QMessageBox, QInputDialog
 from Database import Database
 
 
@@ -66,5 +66,5 @@ class CategoriaDialog(QDialog):
             QMessageBox.warning(self, "Eliminación Cancelada", "La eliminación de la categoría ha sido cancelada.")
 
     def obtenerConfirmacion(self, titulo, mensaje):
-        text, ok = QMessageBox.getText(self, titulo, mensaje, QMessageBox.Ok | QMessageBox.Cancel)
+        text, ok = QInputDialog.getText(self, titulo, mensaje)
         return text if ok else None

@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QVBoxLayout, QLabel, QWidget
 from Productos.Stock import Stock
 from Productos.Categorias import Categorias
+from Proveedores.Proveedores import Proveedores
 from Database import Database
 
 
@@ -24,6 +25,9 @@ class MainWindow(QMainWindow):
         verPedidosAction = QAction('Ver Pedidos', self)
         verPedidosAction.triggered.connect(self.showView('Pedidos'))
 
+        verProveedoresAction = QAction('Ver Proveedores', self)
+        verProveedoresAction.triggered.connect(self.showView('Proveedores'))
+
         # Top menu
         menubar = self.menuBar()
 
@@ -33,6 +37,9 @@ class MainWindow(QMainWindow):
         productosSubMenu.addAction(verStockAction)
         productosMenu.addMenu(productosSubMenu)
 
+        proveedoresMenu = menubar.addMenu('Proveedores')
+        proveedoresMenu.addAction(verProveedoresAction)
+
         pedidosMenu = menubar.addMenu('Pedidos')
         pedidosMenu.addAction(verPedidosAction)
 
@@ -40,9 +47,11 @@ class MainWindow(QMainWindow):
 
     def createViews(self):
         if Database().activeUser == "admin@supermercadosl.com":
-            return
+            # AÑADIR VISTA EMPLEADOS
+            pass
         self.views['Categorias'] = Categorias()
         self.views['Stock'] = Stock()
+        self.views['Proveedores'] = Proveedores()
         self.views['Pedidos'] = QLabel('Vista de Pedidos')
 
         layout = QVBoxLayout()
