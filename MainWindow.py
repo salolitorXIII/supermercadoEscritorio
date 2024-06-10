@@ -16,20 +16,15 @@ class MainWindow(QMainWindow):
         self.views = {}
         self.createViews()
 
+        # Top menu
+        menubar = self.menuBar()
+
+        # MENU PRODUCTOS: CATEGORIAS Y STOCK
         verCategoriasAction = QAction('Ver Categorías', self)
         verCategoriasAction.triggered.connect(self.showView('Categorias'))
 
         verStockAction = QAction('Ver Stock', self)
         verStockAction.triggered.connect(self.showView('Stock'))
-
-        verPedidosAction = QAction('Ver Pedidos', self)
-        verPedidosAction.triggered.connect(self.showView('Pedidos'))
-
-        verProveedoresAction = QAction('Ver Proveedores', self)
-        verProveedoresAction.triggered.connect(self.showView('Proveedores'))
-
-        # Top menu
-        menubar = self.menuBar()
 
         productosMenu = menubar.addMenu('Productos')
         productosSubMenu = QMenu('Productos', self)
@@ -37,22 +32,48 @@ class MainWindow(QMainWindow):
         productosSubMenu.addAction(verStockAction)
         productosMenu.addMenu(productosSubMenu)
 
+
+        # MENU PROVEEDORES: PROVEEDORES
+        verProveedoresAction = QAction('Ver Proveedores', self)
+        verProveedoresAction.triggered.connect(self.showView('Proveedores'))
+
         proveedoresMenu = menubar.addMenu('Proveedores')
         proveedoresMenu.addAction(verProveedoresAction)
 
+
+        # MENU PEDIDOS: PEDIDOS
+        verPedidosAction = QAction('Ver Pedidos', self)
+        verPedidosAction.triggered.connect(self.showView('Pedidos'))
+
         pedidosMenu = menubar.addMenu('Pedidos')
         pedidosMenu.addAction(verPedidosAction)
+
+
+        # MENU ENTREGAS: ENTREGAS
+        verEntregasAction = QAction('Ver Entregas', self)
+        verEntregasAction.triggered.connect(self.showView('Entregas'))
+        entregasMenu = menubar.addMenu('Entregas')
+        entregasMenu.addAction(verEntregasAction)
+
+
+
+        # MENU EMPLEADOS: EMPLEADOS
+        if Database().activeUser == "admin@supermercadosl.com":
+            verEmpleadosAction = QAction('Ver Empleados', self)
+            empleadosMenu = menubar.addMenu('Empleados')
+            empleadosMenu.addAction(verEmpleadosAction)
+
 
         self.showMaximized()
 
     def createViews(self):
         if Database().activeUser == "admin@supermercadosl.com":
-            # AÑADIR VISTA EMPLEADOS
-            pass
+            self.views['Empleados'] = QLabel('Vista de Empleados')
         self.views['Categorias'] = Categorias()
         self.views['Stock'] = Stock()
         self.views['Proveedores'] = Proveedores()
         self.views['Pedidos'] = QLabel('Vista de Pedidos')
+        self.views['Entregas'] = QLabel('Vista de Entregas')
 
         layout = QVBoxLayout()
         for view in self.views.values():
