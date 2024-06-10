@@ -150,6 +150,21 @@ class Database:
         
         documentos = collection.find(estado_filtro).sort(orden).skip(skip).limit(limit)
         return list(documentos) 
+    
+    def actualizarEstadoPedido(self, pedido_id, nuevo_estado):
+        collection = self.database["pedidos"]
+        collection.update_one({"_id": ObjectId(pedido_id)}, {"$set": {"estado": nuevo_estado}})
+    
+
+    # Métodos específicos para la colección de detalles de pedidos
+    def getDocumentosDetallesPedido(self, pedido_id):
+        collection = self.database["detallesPedido"]
+        documentos = collection.find({"idPedido": pedido_id})
+        return list(documentos)
+    
+    def actualizarEstadoLineaPedido(self, linea_pedido_id, nuevo_estado):
+        collection = self.database["detallesPedido"]
+        collection.update_one({"_id": ObjectId(linea_pedido_id)}, {"$set": {"estadoLinea": nuevo_estado}})
 
     
     # Metodos específicos para la clase Login

@@ -1,6 +1,6 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QLineEdit, QLabel, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from Database import Database
-from Pedidos.PedidosDialog import PedidosDialog
+from Pedidos.DetallePedidos import DetallePedido
 
 class Pedidos(QWidget):
     def __init__(self):
@@ -8,6 +8,7 @@ class Pedidos(QWidget):
         self.currentPage = 0
         self.pageSize = 20
         self.initUI()
+        self.detallePedidosWindow = None
 
     def initUI(self):
         layout = QVBoxLayout(self)
@@ -107,5 +108,5 @@ class Pedidos(QWidget):
     def abrirDialogoPedidos(self, item):
         id_pedido = self.table_pedidos.item(item.row(), 0).text()
         pedido = Database().getDocumentoById("pedidos", id_pedido)
-        dialog = PedidosDialog(pedido)
-        dialog.exec_()
+        self.detallePedidosWindow = DetallePedido(pedido)
+        self.detallePedidosWindow.showMaximized()
