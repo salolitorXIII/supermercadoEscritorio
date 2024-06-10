@@ -2,6 +2,7 @@ from PyQt5.QtWidgets import QMainWindow, QAction, QMenu, QVBoxLayout, QLabel, QW
 from Productos.Stock import Stock
 from Productos.Categorias import Categorias
 from Proveedores.Proveedores import Proveedores
+from Pedidos.Pedidos import Pedidos
 from Database import Database
 
 
@@ -56,7 +57,6 @@ class MainWindow(QMainWindow):
         entregasMenu.addAction(verEntregasAction)
 
 
-
         # MENU EMPLEADOS: EMPLEADOS
         if Database().activeUser == "admin@supermercadosl.com":
             verEmpleadosAction = QAction('Ver Empleados', self)
@@ -72,7 +72,7 @@ class MainWindow(QMainWindow):
         self.views['Categorias'] = Categorias()
         self.views['Stock'] = Stock()
         self.views['Proveedores'] = Proveedores()
-        self.views['Pedidos'] = QLabel('Vista de Pedidos')
+        self.views['Pedidos'] = Pedidos()
         self.views['Entregas'] = QLabel('Vista de Entregas')
 
         layout = QVBoxLayout()

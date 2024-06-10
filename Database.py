@@ -1,6 +1,7 @@
 from pymongo import MongoClient
 from bson.objectid import ObjectId
 from bson.errors import InvalidId
+import pymongo
 import re
 
 
@@ -92,6 +93,7 @@ class Database:
         productos = self.database.productos.find(filtro)
         return list(productos)
 
+
     # Métodos específicos para la colección de categorías
     def buscarCategoria(self, termino):
         filtro = {}
@@ -112,6 +114,7 @@ class Database:
         categorias = self.database.categorias.find(filtro)
         return list(categorias)
     
+    
     # Métodos específicos para la colección de proveedores
     def buscarProveedor(self, termino):
         filtro = {}
@@ -131,6 +134,23 @@ class Database:
 
         proveedores = self.database.proveedores.find(filtro)
         return list(proveedores)
+    
+
+    # Métodos específicos para la colección de pedidos
+    def getDocumentosPedidos(self, skip, limit):
+        collection = self.database["pedidos"]
+        
+        estado_filtro = {"estado": {"$in": ["PENDIENTE", "COMPLETADO", "ENVIADO"]}}
+        
+        orden = [
+            ("estado", pymongo.ASCENDING),
+            ("fechaEntrega", pymongo.ASCENDING),
+            ("horaEntrega", pymongo.ASCENDING)
+        ]
+        
+        documentos = collection.find(estado_filtro).sort(orden).skip(skip).limit(limit)
+        return list(documentos) 
+
     
     # Metodos específicos para la clase Login
     def login(self, username, password):

@@ -113,7 +113,7 @@ class Proveedores(QWidget):
         self.page_label.setText("Resultados de la búsqueda")
 
     def abrirDialogoProveedores(self, item):
-        id_producto = self.table_proveedores.item(item.row(), 0).text()
-        producto = Database().getDocumentoById("proveedores", id_producto)
-        dialog = ProveedoresDialog(producto)
+        id_proveedor = self.table_proveedores.item(item.row(), 0).text()
+        proveedor = Database().getDocumentoById("proveedores", id_proveedor)
+        dialog = ProveedoresDialog(proveedor)
         dialog.exec_()
