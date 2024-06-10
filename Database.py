@@ -137,13 +137,35 @@ class Database:
     
 
     # Métodos específicos para la colección de pedidos
+    def buscarPedidos(self, termino):
+        filtro = {}
+        try:
+            ObjectId(termino)
+            filtro.update({
+                "$or": [
+                    {"_id": ObjectId(termino)}
+                ]
+            })
+        except InvalidId:
+            filtro.update({
+                "$or": [
+                    {"estado": {"$regex": termino, "$options": "i"}},
+                    {"idCliente": {"$regex": termino, "$options": "i"}},
+                    {"fechaEntrega": {"$regex": termino, "$options": "i"}}
+                ]
+            }) 
+
+        pedidos = self.database.pedidos.find(filtro)
+        return list(pedidos)
+
+
     def getDocumentosPedidos(self, skip, limit):
         collection = self.database["pedidos"]
         
         estado_filtro = {"estado": {"$in": ["PENDIENTE", "COMPLETADO", "ENVIADO"]}}
         
         orden = [
-            ("estado", pymongo.ASCENDING),
+            ("estado", pymongo.DESCENDING),
             ("fechaEntrega", pymongo.ASCENDING),
             ("horaEntrega", pymongo.ASCENDING)
         ]

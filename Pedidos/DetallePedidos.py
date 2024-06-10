@@ -64,8 +64,6 @@ class DetallePedido(QWidget):
                 todos_añadidos = False
                 break
         if todos_añadidos:
-            self.database.actualizarEstadoPedido(str(self.pedido["_id"]), "ANYADIDO")
-            self.pedido["estado"] = "COMPLETADO"
+            self.database.actualizarEstadoPedido(str(self.pedido["_id"]), "COMPLETADO")
         else:
             self.database.actualizarEstadoPedido(str(self.pedido["_id"]), "PENDIENTE")
-            self.pedido["estado"] = "PENDIENTE"

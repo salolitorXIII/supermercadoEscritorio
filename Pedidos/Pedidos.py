@@ -88,7 +88,7 @@ class Pedidos(QWidget):
         texto_busqueda = self.search_field.text().strip().lower()
 
         if texto_busqueda:
-            resultados = Database().buscarProducto(texto_busqueda)
+            resultados = Database().buscarPedidos(texto_busqueda)
             self.mostrarResultadosBusqueda(resultados)
         else:
             self.actualizarTablaPedidos()
