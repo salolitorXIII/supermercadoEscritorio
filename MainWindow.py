@@ -3,6 +3,7 @@ from Productos.Stock import Stock
 from Productos.Categorias import Categorias
 from Proveedores.Proveedores import Proveedores
 from Pedidos.Pedidos import Pedidos
+from Entregas.Entregas import Entregas
 from Database import Database
 
 
@@ -60,6 +61,7 @@ class MainWindow(QMainWindow):
         # MENU EMPLEADOS: EMPLEADOS
         if Database().activeUser == "admin@supermercadosl.com":
             verEmpleadosAction = QAction('Ver Empleados', self)
+            verEmpleadosAction.triggered.connect(self.showView('Empleados'))
             empleadosMenu = menubar.addMenu('Empleados')
             empleadosMenu.addAction(verEmpleadosAction)
 
@@ -73,7 +75,7 @@ class MainWindow(QMainWindow):
         self.views['Stock'] = Stock()
         self.views['Proveedores'] = Proveedores()
         self.views['Pedidos'] = Pedidos()
-        self.views['Entregas'] = QLabel('Vista de Entregas')
+        self.views['Entregas'] = Entregas()
 
         layout = QVBoxLayout()
         for view in self.views.values():

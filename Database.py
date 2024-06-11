@@ -188,7 +188,64 @@ class Database:
         collection = self.database["detallesPedido"]
         collection.update_one({"_id": ObjectId(linea_pedido_id)}, {"$set": {"estadoLinea": nuevo_estado}})
 
+
+    # Métodos específicos para la colección de entregas
+    def getEntregasCount(self):
+        collection = self.database["pedidos"]
+        total_count = collection.count_documents({"estado": {"$in": ["COMPLETADO", "ENVIADO"]}})
+        return total_count
+
+    def getDocumentosEntregas(self, skip, limit):
+        collection = self.database["pedidos"]
+        
+        estado_filtro = {"estado": {"$in": ["COMPLETADO", "ENVIADO"]}}
+        
+        orden = [
+            ("estado", pymongo.DESCENDING),
+            ("fechaEntrega", pymongo.ASCENDING),
+            ("horaEntrega", pymongo.ASCENDING)
+        ]
+        
+        documentos = collection.find(estado_filtro).sort(orden).skip(skip).limit(limit)
+        return list(documentos)
     
+    def buscarEntregas(self, termino):
+        collection = self.database["pedidos"]
+        
+        try:
+            ObjectId(termino)
+            es_id = True
+        except InvalidId:
+            es_id = False
+
+        filtro = {"estado": {"$in": ["COMPLETADO", "ENVIADO"]}}
+
+        if es_id:
+            filtro.update({
+                "$or": [
+                    {"_id": ObjectId(termino)},
+                ]
+            })
+        else:
+            filtro.update({
+                "$or": [
+                    {"fechaEntrega": {"$regex": termino, "$options": "i"}},
+                    {"horaEntrega": {"$regex": termino, "$options": "i"}},
+                    {"dirección": {"$regex": termino, "$options": "i"}},
+                    {"estado": {"$regex": termino, "$options": "i"}}
+                ]
+            })
+
+        orden = [
+            ("estado", pymongo.DESCENDING),
+            ("fechaEntrega", pymongo.ASCENDING),
+            ("horaEntrega", pymongo.ASCENDING)
+        ]
+
+        pedidos = collection.find(filtro).sort(orden)
+        return list(pedidos)
+    
+
     # Metodos específicos para la clase Login
     def login(self, username, password):
         regex_username = re.compile(username, re.IGNORECASE)

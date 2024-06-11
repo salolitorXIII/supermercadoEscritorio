@@ -1,7 +1,7 @@
 from PyQt5.QtWidgets import QVBoxLayout, QHBoxLayout, QPushButton, QWidget, QTableWidget, QTableWidgetItem, QHeaderView, QAbstractItemView
 from Pedidos.PedidosDialog import PedidosDialog
 from Database import Database
-from bson.objectid import ObjectId
+
 
 class DetallePedido(QWidget):
     def __init__(self, pedido=None):
